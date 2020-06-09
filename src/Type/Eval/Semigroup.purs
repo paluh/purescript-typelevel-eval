@@ -2,9 +2,11 @@ module Type.Eval.Semigroup where
 
 import Prelude (Unit)
 import Prim.RowList as RL
+import Prim.Symbol (class Append) as S
 import Type.Data.RowList (RLProxy)
 import Type.Eval (class Eval, kind TypeExpr)
 import Type.Eval.Tuple (Tuple)
+import Type.Prelude (SProxy)
 
 foreign import data Append :: Type -> Type -> TypeExpr
 
@@ -24,3 +26,9 @@ else instance append_HList_Cons ::
   ( Eval (Append b t) t'
   ) =>
   Eval (Append (Tuple a b) t) (Tuple a t')
+
+instance append_Symbol ::
+  ( S.Append s1 s2 s3
+  ) =>
+  Eval (Append (SProxy s1) (SProxy s2)) (SProxy s3)
+
