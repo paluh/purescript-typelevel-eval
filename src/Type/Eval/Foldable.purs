@@ -1,5 +1,6 @@
 module Type.Eval.Foldable where
 
+import Data.Generic.Rep (Constructor, NoArguments, NoConstructors, Product, Sum) as GR
 import Data.Symbol (SProxy)
 import Data.Tuple (Tuple)
 import Prim.RowList as RL
@@ -24,7 +25,32 @@ instance foldr_Tuple ::
   ) =>
   Eval (Foldr fn z (Tuple a b)) ty
 
+instance foldr_Generic_NoArguments ::
+  ( Eval z ty
+  ) =>
+  Eval (Foldr fn z GR.NoArguments) ty
+
+instance foldr_Generic_Product ::
+  ( Eval (Foldr fn (Foldr fn z b) a) ty
+  ) =>
+  Eval (Foldr fn z (GR.Product a b)) ty
+
 foreign import data FoldrWithIndex :: (Type -> Type -> TypeExpr -> TypeExpr) -> TypeExpr -> Type -> TypeExpr
+
+instance foldrWithIndex_Generic_NoConstructor ::
+  ( Eval z ty
+  ) =>
+  Eval (FoldrWithIndex fn z GR.NoConstructors) ty
+
+instance foldrWithIndex_Generic_Constructor ::
+  ( Eval (fn (SProxy sym) a z) ty
+  ) =>
+  Eval (FoldrWithIndex fn z (GR.Constructor sym a)) ty
+
+instance fodlrWithIndex_Generic_Sum ::
+  ( Eval (FoldrWithIndex fn (FoldrWithIndex fn z b) a) ty
+  ) =>
+  Eval (FoldrWithIndex fn z (GR.Sum a b)) ty
 
 instance foldrWithIndex_RowList_Cons ::
   ( Eval (fn (SProxy sym) a (FoldrWithIndex fn z (RLProxy rl))) ty
@@ -35,6 +61,7 @@ instance foldrWithIndex_RowList_Nil ::
   ( Eval z ty
   ) =>
   Eval (FoldrWithIndex fn z (RLProxy RL.Nil)) ty
+
 
 foreign import data AllFold :: (Type -> TypeExpr) -> Type -> TypeExpr -> TypeExpr
 

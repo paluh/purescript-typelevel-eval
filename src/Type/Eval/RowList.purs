@@ -18,3 +18,4 @@ instance toRow ::
   ( ListToRow rl r
   ) =>
   Eval (ToRow (RLProxy rl)) (RProxy r)
+
